@@ -1,14 +1,15 @@
-from pydantic.v1 import BaseSettings
+from pathlib import Path
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     app_name: str = "City temperature measurement"
-
+    api_key: str
+    weather_api_url: str
     database_url: str | None = "sqlite:///./city_temperature.db"
 
     class Config:
-        case_sensitive = True
-        env_file = ".env"
-
+        env_file = Path(__file__).parent.parent / ".env"
 
 settings = Settings()

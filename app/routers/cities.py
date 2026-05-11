@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.dependencies import get_db
 from app import schemas
+from app.schemas import City
 
 router = APIRouter(
     prefix="/cities",
@@ -18,14 +19,14 @@ def read_cities(
         skip: int = 0,
         limit: int = 100,
         db: Session = Depends(get_db),
-) -> List[schemas.City]:
+) -> list[type[City]]:
     return crud.get_all_cities(db, skip=skip, limit=limit)
 
 @router.get("/{city_id}")
 def read_city(
         city_id: int,
         db: Session = Depends(get_db),
-) -> schemas.City:
+) -> type[City]:
     db_city = crud.get_city_by_id(db=db, city_id=city_id)
 
     if db_city is None:

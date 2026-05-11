@@ -12,5 +12,5 @@ app.include_router(temperatures.router)
 
 
 @app.get("/")
-def root():
+def root() -> dict:
     return {"message": "Hello World"}
