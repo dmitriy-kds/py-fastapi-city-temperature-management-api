@@ -7,6 +7,7 @@ from sqlalchemy import (
     func,
     Float
 )
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -23,10 +24,12 @@ class Temperature(Base):
     __tablename__ = "temperature"
 
     id = Column(Integer, primary_key=True)
-    city_id = Column(Integer, ForeignKey("city.id"))
+    city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
     date_time = Column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False
     )
     temperature = Column(Float, nullable=False)
+
+    city = relationship("City", backref="temperatures")

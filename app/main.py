@@ -1,13 +1,16 @@
 from fastapi import FastAPI
+from app.routers import cities, temperatures
 
-app = FastAPI()
+app = FastAPI(
+    title="Weather API",
+    description="City temperatures tracker",
+    version="0.1.0",
+)
+
+app.include_router(cities.router)
+app.include_router(temperatures.router)
 
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
