@@ -9,7 +9,5 @@ services:
             fastapi run app/main.py"
     volumes:
       - ./data:/app/data
-    environment:
-      - DATABASE_URL=sqlite+aiosqlite:///./data/city_temperature.db
     env_file:
       - .env
