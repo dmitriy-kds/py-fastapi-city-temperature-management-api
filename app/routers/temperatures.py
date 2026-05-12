@@ -43,10 +43,15 @@ async def fetch_temperature_for_city(
         )
         response.raise_for_status()
         return response.json()["current"]["temp_c"]
-    except httpx.HTTPStatusError:
+    except httpx.HTTPStatusError as error:
+        if error.response.status_code == 400:
+            raise HTTPException(
+                status_code=404,
+                detail=f"City '{city.name}' not found on weather service"
+            )
         raise HTTPException(
             status_code=502,
-            detail="External API error"
+            detail=f"External API error"
         )
 
 @router.post("/update")
