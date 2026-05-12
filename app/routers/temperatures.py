@@ -62,13 +62,17 @@ async def update_temperatures_of_all_cities(
 
     async with httpx.AsyncClient() as client:
         results = await asyncio.gather(
-            *[fetch_temperature_for_city(client, city) for city in cities]
+            *[fetch_temperature_for_city(client, city) for city in cities],
+            return_exceptions=True
         )
 
-    for city, temperature in zip(cities, results):
+    for city, result in zip(cities, results):
+        if isinstance(result, Exception):
+            print(f"Failed to fetch temperature for {city.name}: {result}")
+            continue
         temperature = models.Temperature(
             city_id=city.id,
-            temperature=temperature
+            temperature=result
         )
         db.add(temperature)
     await db.commit()
