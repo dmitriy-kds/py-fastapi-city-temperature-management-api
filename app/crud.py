@@ -39,6 +39,9 @@ async def update_city(
 ) -> models.City | None:
     db_city = await get_city_by_id(db, city_id)
 
+    if db_city is None:
+        return None
+
     if city.name:
         db_city.name = city.name
     if city.additional_info:
@@ -53,6 +56,10 @@ async def delete_city(
         city_id: int,
 ) -> None:
     db_city = await get_city_by_id(db, city_id)
+
+    if db_city is None:
+        return None
+
     await db.delete(db_city)
     await db.commit()
 
