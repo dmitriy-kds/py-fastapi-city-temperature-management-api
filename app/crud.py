@@ -1,80 +1,87 @@
-from typing import List
+from typing import Sequence
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app import schemas, models
 
 
-def get_all_cities(
-        db: Session,
+async def get_all_cities(
+        db: AsyncSession,
         skip: int = 0,
         limit: int = 100,
-) -> List[type[schemas.City]]:
-    return db.query(models.City).offset(skip).limit(limit).all()
+) -> Sequence[models.City]:
+    result = await db.execute(select(models.City).offset(skip).limit(limit))
+    return result.scalars().all()
 
-def get_city_by_id(
-        db: Session,
+async def get_city_by_id(
+        db: AsyncSession,
         city_id: int,
-) -> type[schemas.City] | None:
-    return db.query(models.City).filter(models.City.id == city_id).first()
+) -> models.City | None:
+    result = await db.execute(select(models.City).where(models.City.id == city_id))
+    return result.scalar_one_or_none()
 
-def create_city(
-        db: Session,
+async def create_city(
+        db: AsyncSession,
         city: schemas.CityCreate,
-) -> schemas.City:
+) -> models.City:
     db_city = models.City(**city.model_dump())
     db.add(db_city)
-    db.commit()
-    db.refresh(db_city)
+    await db.commit()
+    await db.refresh(db_city)
 
     return db_city
 
-def update_city(
-        db: Session,
+async def update_city(
+        db: AsyncSession,
         city_id: int,
-        city: schemas.CityCreate,
-) -> type[schemas.City] | None:
-    db_city = get_city_by_id(db, city_id)
+        city: schemas.CityUpdate,
+) -> models.City | None:
+    db_city = await get_city_by_id(db, city_id)
 
-    db_city.name = city.name
-    db_city.additional_info = city.additional_info
-    db.commit()
-    db.refresh(db_city)
+    if city.name:
+        db_city.name = city.name
+    if city.additional_info:
+        db_city.additional_info = city.additional_info
+    await db.commit()
+    await db.refresh(db_city)
 
     return db_city
 
-def delete_city(
-        db: Session,
+async def delete_city(
+        db: AsyncSession,
         city_id: int,
 ) -> None:
-    db_city = get_city_by_id(db, city_id)
-    db.delete(db_city)
-    db.commit()
+    db_city = await get_city_by_id(db, city_id)
+    await db.delete(db_city)
+    await db.commit()
 
-def get_all_temperatures(
-        db: Session,
+async def get_all_temperatures(
+        db: AsyncSession,
         city_id: int | None = None,
         skip: int = 0,
         limit: int = 100,
-) -> List[type[schemas.Temperature]]:
-    query = db.query(models.Temperature)
+) -> Sequence[models.Temperature]:
+    query = select(models.Temperature)
 
     if city_id:
-        query = query.filter(models.Temperature.city_id == city_id)
+        query = query.where(models.Temperature.city_id == city_id)
 
-    return query.offset(skip).limit(limit).all()
+    query = query.offset(skip).limit(limit)
+    result = await db.execute(query)
+    return result.scalars().all()
 
-def create_temperature(
-        db: Session,
+async def create_temperature(
+        db: AsyncSession,
         city_id: int,
         temperature: float,
-) -> schemas.Temperature:
+) -> models.Temperature:
     db_temperature = models.Temperature(
         city_id=city_id,
         temperature=temperature
     )
     db.add(db_temperature)
-    db.commit()
-    db.refresh(db_temperature)
+    await db.commit()
+    await db.refresh(db_temperature)
 
     return db_temperature

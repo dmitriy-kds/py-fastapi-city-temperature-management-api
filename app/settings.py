@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "City temperature measurement"
     api_key: str
     weather_api_url: str
-    database_url: str | None = "sqlite:///./city_temperature.db"
+    database_url: str | None = "sqlite+aiosqlite:///./data/city_temperature.db"
 
     class Config:
         env_file = Path(__file__).parent.parent / ".env"

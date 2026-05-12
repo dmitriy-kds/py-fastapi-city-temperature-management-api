@@ -15,6 +15,10 @@ class City(CityBase):
 class CityCreate(CityBase):
     pass
 
+class CityUpdate(BaseModel):
+    name: str | None = None
+    additional_info: str | None = None
+
 
 class TemperatureBase(BaseModel):
     city_id: int

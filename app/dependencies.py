@@ -1,14 +1,11 @@
-from functools import lru_cache
-from typing import Iterator
-
-from sqlalchemy.orm import Session
+from typing import Any, AsyncGenerator
 
 from app.database import SessionLocal
 
 
-def get_db() -> Iterator[Session] | None:
+async def get_db() -> AsyncGenerator[Any, Any]:
     db = SessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()
