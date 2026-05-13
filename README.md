@@ -37,10 +37,10 @@ For easier interoperability and sharing
 
 Layered Architecture
 The project follows a clear separation of concerns:
-- Models — SQLAlchemy ORM definitions
-- Schemas — Pydantic models for request/response validation
-- CRUD — database operations, isolated from HTTP logic
-- Routers — HTTP endpoints, only handle request/response concerns
+- Models: SQLAlchemy ORM definitions
+- Schemas: Pydantic models for request/response validation
+- CRUD: database operations, isolated from HTTP logic
+- Routers: HTTP endpoints, only handle request/response concerns
 
 Settings via Pydantic BaseSettings
 All configuration (API key, database URL, weather API URL) is loaded from environment variables through a Settings class, validated on startup
